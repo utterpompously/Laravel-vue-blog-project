@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Categorie;
+use App\Category;
 use App\Post;
 use Illuminate\Http\Request;
 
@@ -14,7 +16,8 @@ class PostController extends Controller
      */
     public function index()
     {
-        //
+        $post = Post::all();
+        return $post;
     }
 
     /**
@@ -35,7 +38,15 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $this->validate($request, array(
+            'cat_name' => 'required|min:3|max:20',
+
+        ));
+
+        $post = new Post();
+        $post->cat_name = $request->cat_name;
+
+        $post->save();
     }
 
     /**
@@ -46,7 +57,10 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        //
+        $posts = Post::with('user','category')->get();
+        return response()->json([
+            'posts' =>$posts
+        ],200);
     }
 
     /**
@@ -55,9 +69,12 @@ class PostController extends Controller
      * @param  \App\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function edit(Post $post)
+    public function edit(Post $post, $id)
     {
-        //
+        $post = Post::find($id);
+        return response()->json([
+            'post' =>$post
+        ],200);
     }
 
     /**
@@ -67,9 +84,17 @@ class PostController extends Controller
      * @param  \App\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Post $post)
+    public function update(Request $request, Post $post, $id)
     {
-        //
+        $this->validate($request, array(
+            'cat_name' => 'required|min:3|max:20',
+
+        ));
+
+        $post = Post::find($id);
+        $post->cat_name = $request->cat_name;
+
+        $post->save();
     }
 
     /**
@@ -78,8 +103,9 @@ class PostController extends Controller
      * @param  \App\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Post $post)
+    public function destroy(Post $post, $id)
     {
-        //
+        $post = Post::find($id);
+        $post->delete();
     }
 }
